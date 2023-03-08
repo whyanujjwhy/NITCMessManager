@@ -23,9 +23,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button button1 = findViewById(R.id.button1);
         Button button2 = findViewById(R.id.button2);
-        Button button3 = findViewById(R.id.button3);
-        Button button4 = findViewById(R.id.button4);
-        textView = findViewById(R.id.textView);
+
+
         //editText = findViewById(R.id.editText);
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,12 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 openActivityAdminLogin();
             }
         });*/
-        button4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Hi USER!!!", Toast.LENGTH_SHORT).show();
-            }
-        });
+
     }
     public void openActivityRegistration() {
         Intent I=new Intent(this, RegistrationActivity.class);
