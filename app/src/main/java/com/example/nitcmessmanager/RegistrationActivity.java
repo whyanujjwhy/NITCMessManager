@@ -126,11 +126,11 @@ public class RegistrationActivity extends AppCompatActivity {
                                                 //send verification email
                                                 fbUser.sendEmailVerification();
                                                 //open user profile
-                                               /* Intent intent = new Intent(RegistrationActivity.this, UserProfileActivity.class);
+                                               Intent intent = new Intent(RegistrationActivity.this, UserProfileActivity.class);
                                                 //prevents user to go back to registration page after registering once.
                                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 startActivity(intent);
-                                                finish();*/
+                                                finish();
                                             }
                                             else {
                                                 Toast.makeText(RegistrationActivity.this, "Student registration failed", Toast.LENGTH_LONG).show();
