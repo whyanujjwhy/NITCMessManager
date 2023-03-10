@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
                     FirebaseUser fbUser=authProfile.getCurrentUser();
 
                     //check if email is verified before user can access their profile
-                    if(fbUser.isEmailVerified()) {
+                    //if(fbUser.isEmailVerified()) {
                         Toast.makeText(LoginActivity.this, "User logged in successfully", Toast.LENGTH_LONG).show();
                         //open user profile activity
                         Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
@@ -115,12 +115,12 @@ public class LoginActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
-                    }
-                    else {
+                   //  }
+                   /* else {
                         fbUser.sendEmailVerification();
                         authProfile.signOut();
                         showAlertDialog();
-                    }
+                    }*/
                 }
                 else {
                     try {
