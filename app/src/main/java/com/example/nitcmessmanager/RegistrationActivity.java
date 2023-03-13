@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,12 +29,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class RegistrationActivity extends AppCompatActivity {
     private EditText etUsername, etEmail, etName, etPassword;
     private ProgressBar progressBar;
+
     private static final String TAG = "RegistrationActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,49 +109,31 @@ public class RegistrationActivity extends AppCompatActivity {
     }
     private void registerUser(String username, String email, String name, String pwd) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore fStore = FirebaseFirestore.getInstance();
         //creating user profile
-        auth.createUserWithEmailAndPassword(email, pwd).addOnCompleteListener(RegistrationActivity.this,
-                new OnCompleteListener<AuthResult>() {
+        auth.createUserWithEmailAndPassword(email, pwd).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()) {
-                            //Toast.makeText(RegistrationActivity.this, "Student registered successfully", Toast.LENGTH_LONG).show();
+                    public void onSuccess(AuthResult authResult) {
+                        //if(task.isSuccessful()) {
+                            Toast.makeText(RegistrationActivity.this, "Student registered successfully", Toast.LENGTH_LONG).show();
 
                             FirebaseUser fbUser=auth.getCurrentUser();
                             //display name of user
-                            UserProfileChangeRequest profileChangeReq = new UserProfileChangeRequest.Builder().setDisplayName(name).build();
-                            fbUser.updateProfile(profileChangeReq);
-                            //enter user data into FB Realtime DB
-                            ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(username, email, pwd);
-                            //extracting user ref from DB for Reg users
-                            DatabaseReference refProfile= FirebaseDatabase.getInstance().getReference("Registered Users");
-                            refProfile.child(fbUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()) {
-                                                Toast.makeText(RegistrationActivity.this, "Student registered successfully", Toast.LENGTH_LONG).show();
-                                                //send verification email
-                                                fbUser.sendEmailVerification();
-                                                //open user profile
-                                               Intent intent = new Intent(RegistrationActivity.this, UserProfileActivity.class);
-                                                //prevents user to go back to registration page after registering once.
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(intent);
-                                                finish();
-                                            }
-                                            else {
-                                                Toast.makeText(RegistrationActivity.this, "Student registration failed", Toast.LENGTH_LONG).show();
+                        DocumentReference df = fStore.collection("Users").document(fbUser.getUid());
+                        Map<String, Object> userInfo=new HashMap<>();
+                        userInfo.put("Username", username);
+                        userInfo.put("Email", email);
+                        userInfo.put("Name", name);
+                        //userInfo.put("Password", pwd);
+                        userInfo.put("Type", "Student");
 
-                                            }progressBar.setVisibility(View.GONE);
-                                        }
-                                    });
-
-
-
-                        }
-                        else {
+                        df.set(userInfo);
+                        startActivity(new Intent(getApplicationContext(), UserProfileActivity.class));
+                        finish();
+                        //}
+                       /* else {
                             try {
-                                throw task.getException();
+                                throw getException();
                             }
                             catch (FirebaseAuthWeakPasswordException e) {
                                 etPassword.setError("Password too weak, use a alphanumeric pwd");
@@ -163,8 +152,13 @@ public class RegistrationActivity extends AppCompatActivity {
                                 Toast.makeText(RegistrationActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
 
                             }progressBar.setVisibility(View.GONE);
-                        }
+                        }*/
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(RegistrationActivity.this, "Failed registration", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

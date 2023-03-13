@@ -21,18 +21,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.rpc.context.AttributeContext;
+
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+
     private EditText etEmail, etPassword;
     private ProgressBar progressBar;
     private static final String TAG = "LoginActivity";
-    private FirebaseAuth authProfile;
+    //private FirebaseAuth authProfile;
     String[] users={"Select User Type", "Student", "Mess Contractor", "Admin"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
         TextView btnNewUser=findViewById(R.id.newUser);
         Button btnLogin=findViewById(R.id.btnLogin);
-        authProfile=FirebaseAuth.getInstance();
+
         btnNewUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,16 +110,18 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     private void loginUser(String email, String pwd) {
-        authProfile.signInWithEmailAndPassword(email, pwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+        auth.signInWithEmailAndPassword(email, pwd).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()) {
+            public void onSuccess(AuthResult authResult) {
+               // if(task.isSuccessful()) {
                     //get instance of current user
-                    FirebaseUser fbUser=authProfile.getCurrentUser();
+                    //FirebaseUser fbUser=authProfile.getCurrentUser();
 
                     //check if email is verified before user can access their profile
                     //if(fbUser.isEmailVerified()) {
                         Toast.makeText(LoginActivity.this, "User logged in successfully", Toast.LENGTH_LONG).show();
+                        checkUserAccessLevel(authResult.getUser().getUid());
                         //open user profile activity
                         Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
                         //prevents user to go back to registration page after registering once.
@@ -121,8 +134,8 @@ public class LoginActivity extends AppCompatActivity {
                         authProfile.signOut();
                         showAlertDialog();
                     }*/
-                }
-                else {
+               // }
+                /*else {
                     try {
                         throw task.getException();
                     }
@@ -140,8 +153,33 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
 
-                }
+                }*/
                 progressBar.setVisibility(View.GONE);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+    private void checkUserAccessLevel(String uid) {
+        //extracts data from fstore
+        DocumentReference df = fStore.collection("Users").document(uid);
+        df.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Log.d("TAG", "onSuccess: " + documentSnapshot.getData());
+                 //identify user type
+                if(Objects.equals(documentSnapshot.getString("Type"), "Student")) {
+                    startActivity(new Intent(LoginActivity.this, UserProfileActivity.class));
+                    finish();
+                } else if (Objects.equals(documentSnapshot.getString("Type"), "Admin")) {
+                    startActivity(new Intent(LoginActivity.this, AdminProfileActivity.class));
+                    finish();
+                }
             }
         });
     }
@@ -168,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(authProfile.getCurrentUser() != null) {
+        if(auth.getCurrentUser() != null) {
             Toast.makeText(LoginActivity.this, "Already logged in!", Toast.LENGTH_SHORT).show();
             //start userProfileActivity
             startActivity(new Intent(LoginActivity.this, UserProfileActivity.class));
