@@ -71,7 +71,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="76dp"
         android:layout_marginEnd="100dp"
         android:background="@drawable/btn_bg"
         android:shadowColor="#00DA1D1D"
@@ -93,24 +93,15 @@
         android:layout_marginEnd="100dp"
         android:linksClickable="false"
         android:shadowColor="@color/black"
-        android:text="New User?"
+        android:text="New User? Create Account"
+        android:textColor="@color/black"
         android:textColorLink="#03A9F4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
 
-    <TextView
-        android:id="@+id/forgotpass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="84dp"
-        android:text="Forgot Password?"
-        android:textColor="@color/colorBlack"
-        app:layout_constraintEnd_toEndOf="@+id/inputPwd"
-        app:layout_constraintTop_toBottomOf="@+id/inputPwd" />
-
-    <Spinner
+    <!-- <Spinner
         android:id="@+id/userType"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -120,6 +111,17 @@
         android:background="@android:drawable/btn_dropdown"
         app:layout_constraintEnd_toEndOf="@+id/inputPwd"
         app:layout_constraintStart_toStartOf="@+id/inputPwd"
+        app:layout_constraintTop_toBottomOf="@+id/inputPwd" />
+-->
+
+    <TextView
+        android:id="@+id/forgotpass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Forgot Password?"
+        android:textColor="@color/colorBlack"
+        app:layout_constraintEnd_toEndOf="@+id/inputPwd"
         app:layout_constraintTop_toBottomOf="@+id/inputPwd" />
 
     <ProgressBar
