@@ -38,6 +38,7 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
+
     FirebaseFirestore fStore = FirebaseFirestore.getInstance();
 
     private EditText etEmail, etPassword;
@@ -47,13 +48,14 @@ public class LoginActivity extends AppCompatActivity {
     String[] users={"Select User Type", "Student", "Mess Contractor", "Admin"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        auth.signOut();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         progressBar=findViewById(R.id.progressBar);
         etEmail=findViewById(R.id.inputEmail);
         etPassword=findViewById(R.id.inputPwd);
-        Spinner type=findViewById(R.id.userType);
+        //Spinner type=findViewById(R.id.userType);
 
         TextView btnNewUser=findViewById(R.id.newUser);
         Button btnLogin=findViewById(R.id.btnLogin);
@@ -65,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-        ArrayAdapter<String> adaptor=new ArrayAdapter<String>(LoginActivity.this, android.R.layout.simple_spinner_item, users);
+        /*ArrayAdapter<String> adaptor=new ArrayAdapter<String>(LoginActivity.this, android.R.layout.simple_spinner_item, users);
         adaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         type.setAdapter(adaptor);
 
@@ -80,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        });
+        });*/
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,11 +125,11 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "User logged in successfully", Toast.LENGTH_LONG).show();
                         checkUserAccessLevel(authResult.getUser().getUid());
                         //open user profile activity
-                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                       // Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
                         //prevents user to go back to registration page after registering once.
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        finish();
+                        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        //startActivity(intent);
+                        //finish();
                    //  }
                    /* else {
                         fbUser.sendEmailVerification();
@@ -174,10 +176,14 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("TAG", "onSuccess: " + documentSnapshot.getData());
                  //identify user type
                 if(Objects.equals(documentSnapshot.getString("Type"), "Student")) {
-                    startActivity(new Intent(LoginActivity.this, UserProfileActivity.class));
+                    Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     finish();
                 } else if (Objects.equals(documentSnapshot.getString("Type"), "Admin")) {
-                    startActivity(new Intent(LoginActivity.this, AdminProfileActivity.class));
+                    Intent intent = new Intent(LoginActivity.this, AdminProfileActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     finish();
                 }
             }
